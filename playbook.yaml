@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Copy Python script to the remote machine
+      ansible.builtin.copy:
+        src: generate_inventory.py
+        dest: /tmp/generate_inventory.py
+        mode: '0755'
+
+    - name: Run Python script to generate inventory
+      ansible.builtin.command:
+        cmd: python /tmp/generate_inventory.py
+        chdir: /tmp
+      register: script_result
+
+    - name: Print script result
+      ansible.builtin.debug:
+        msg: "{{ script_result.stdout }}"
+
+    - name: Run Ansible playbook using the generated inventory
+      ansible.builtin.command:
+        cmd: ansible-playbook /path/to/playbook.yml -i /tmp/inventory.ini
+      chdir: /tmp
